@@ -1,168 +1,678 @@
 
 # Chapter 17: Databases
 
+In the last lecture, we learned about dictionaries as a precursor to 
+this chapter about databases. 
+I went through the following examples of databases in which
+your very own information is stored. 
+For example, the IRS keeps a record of your tax imformation by 
+recording amounts in the fields of your tax return, 
+your vital statistics, and the primary key is your social security number. 
+If you have a driver's license, the DMV keeps a record of your vehicles, 
+any tickets you may have received, your vital statistics, 
+and these are indexed by your driver's license number as the primary key. 
+The same is true for any online purchases you make: 
+your order details, your address and your purchase history 
+are all stored in a database with some form of customer id number and order number. 
 
-## Advanced Features
+Here we will learn one way that this sort of information can be stored, 
+retrieved and organized. 
+Businesses rely heavily on databases to keep track of information 
+for many accounting and payroll functions.
+A primary reason for a business analyst or data scientist to use databases
+is to generate a dataset from the information stored in databases. 
 
-The primary use of databases is to organize and retrieve data. 
-In practice, you often want to retrieve the data to perform some sort of calculation
-and it is often worthwhile to perform these calculations on the computer system
-that contains the database. 
-Servers typically have much more computing power than your PC or laptop, 
-so it is best to do any calculations you can on a server
-and then transfer only a small dataset to your computer. 
+The primary tool that we will use is the Python module ```sqlite3```. 
+SQL is an acronym for *Structured Query Language*, 
+which is either pronounced "S-Q-L" or "sequel". 
+It is a language or, more precisely, a set of dialects that are used to 
+execute commands called *queries* using *relational databases*. 
+There exist many dialects of SQL and in fact, many other database structures
+that do not fall under the SQL paradigm. 
+However, SQL is ubiquitous in business and is a stepping stone to more advanced
+methods of interacting with databases.
+The dialect of SQL called ```sqlite3``` is a compact and versatile 
+set of infrastructure for executing SQL queries and interacting with databases. 
+Most of the important SQL commands can be executed in ```sqlite3```
+and, with a few exceptions, most of the syntax is identical 
+to that which you would use in another dialect of SQL. 
+
+There are other ways of executing commands to interact with databases:
+- *Typing commands into a database GUI:* You might have a graphical program, 
+in which you enter the SQL queries, 
+much like we do by running Python commands in Spyder.
+- *By writing programs in some language:* 
+These programs import a library of functions that allow you to interact with
+a database. Python is one of many languages in which this can be achieved. 
+
+We will follow the second approach, 
+and the first step on this journey is to load the Python module ```sqlite3```. 
 
 
+```python 
+>>> import sqlite3
+
+``` 
+
+Let's get started. 
 
 
-### Aggregation
+## Creating and Populating
 
-We have already encountered an instance of aggregation:
-the ```SUM``` is the most basic form of aggregation. 
+The example we will use in this section is a set of predicted populations
+in regions of the world for the year 2300. 
+The numbers are shown in Table 30 
+called *Estimated World Population in 2300*
+on page 345
+of *Practical Programming*, 
+and the data are taken from http://www.worldmapper.org.
 
-This command calculates the sum of the population, tabulated by Region.
+First, we tell Python that we want to use ```sqlite3```. 
+
+```python 
+>>> import sqlite3
+```
+
+Next, we must make a connection to our database. 
+Databases can be stored in a file with extension ```db```. 
+Often the database sits on a server that can hold large amounts of data. 
+In that case, you will need access to that computer and will have to pass login credentials (username and password) to open the connection. 
+For our purposes, we will assume that the ```db``` file is located on your computer. 
+To make the connection, we call the ```sqlite3``` method ```connect```
+and pass the string filename as the argument. 
+
+```python 
+>>> con = sqlite3.connect('population.db')
+``` 
+If there is no database called ```'population.db'```, 
+```sqlite3``` will open an empty database. 
+
+Once we have made a connection, we need to get a cursor. 
+Like the cursor in an editor (the blinking vertical line), 
+this keeps track of where we are in the database. 
+If several users are accessing the database at the same time, 
+the database can also keep track of who is doing what. 
+
+```python 
+>>> cur = con.cursor()
+``` 
+
+Now we can start working with the database. 
+So far, it is empty. 
+The first step is to execute a command that ```CREATE```s a ```TABLE```
+in which to store data. 
+We pass commands to the database to run at the cursor 
+using the ```execute``` method, 
+by passing the SQL command in the form of a string. 
+
+The basic command for creating a table is 
 
 ```python
->>> cur.execute('SELECT SUM (Population) FROM PopByRegion')
+'CREATE TABLE Name_of_Tale(Column_name type, ...)'
+```
+
+The types for each column of data are shown in the following table.
+
+
+| Type    | Python Equivalent | Usage
+| ------- | ----------------- | -----------------------------
+| NULL    | NoneType          | Means "no information"
+| INTEGER | int               | Integers
+| REAL    | float             | 8-byte floating-point numbers
+| TEXT    | str               | Strings of Characters
+| BLOB    | bytes             | Binary data
+
+Most of these data types should be familiar to you. 
+The new term is ```BLOB```, which stands for 
+*Binary Large Object*, which could represent any object that can be stored in binary form. 
+Your playlist might be stored in this format, 
+as the ```BLOB``` data type is rich enough to store ```mp3``` files, for example. 
+
+Now we will use these data types to create a two-column table
+named ```PopByRegion``` to store 
+regions named as strings in the ```Region``` column
+and projected populations as integers in the ```Population``` column. 
+
+
+```python 
+>>> cur.execute('CREATE TABLE PopByRegion(Region TEXT, Population INTEGER)')
+<sqlite3.Cursor object at 0x102e3e490>
+
+``` 
+Note that this command only returns the cursor and its location. 
+So far, the table is empty but we can ```INSERT``` some ```VALUES```
+to change that. 
+
+```python 
+>>> cur.execute('INSERT INTO PopByRegion VALUES("Central Africa", 330993)')
+<sqlite3.Cursor object at 0x102e3e490>
+>>> cur.execute('INSERT INTO PopByRegion VALUES("Southeastern Africa", '
+...             '743112)')
+<sqlite3.Cursor object at 0x102e3e490>
+...
+>>> cur.execute('INSERT INTO PopByRegion VALUES("Japan", 100562)')
+<sqlite3.Cursor object at 0x102e3e490>
+
+``` 
+Much like the way a dictionary works, 
+it looks as though we pass it a tuple
+in the order of the fields in the database. 
+Again, this command is passed to the database with the ```execute``` method. 
+
+For a large number of entries, you will not want to
+type these commands manually. 
+Another way that you could execute the ```INSERT VALUES``` command
+is to use question marks as placeholders and pass tuples 
+of field values to fill in the ```?``` places in the string ```'(?, ?)'```. 
+
+```python 
+>>> cur.execute('INSERT INTO PopByRegion VALUES (?, ?)', ("Japan", 100562))
+
+``` 
+We have seen a similar construction for strings:
+
+```python
+>>> 'Recall the {0} {1} for {2}.'.format('format', 'method','strings')
+'Recall the format method for strings.'
+```
+
+
+### Saving Changes
+
+However you enter your data, you will need to save the state of your database,
+much like you would for any other program. 
+The commit method saves the changes. 
+
+```python 
+>>> con.commit()
+
+``` 
+Use the commit command like you would the ```Ctrl-S``` command. 
+(You are doing this, aren't you? 
+You know what they say: "Save early. Save often.")
+
+If the program crashes, for any reason, the work you have done 
+is only stored up to the last commit. 
+
+
+
+### Closing the Connection
+
+Finally, when all the work is done, we need to
+```close``` the connection.. 
+
+
+```python 
+>>> con.close()
+
+``` 
+This is just like closing a file. 
+make sure, though, that you have "saved" all of your changes
+with a call to ```commit```, 
+otherwise those changes will not be saved. 
+The main purpose of closing the connection is to free up resources, 
+such as the memory required to store a database. 
+
+
+Closing the connection at this point makes sense
+because it separates the roles of the producers
+and consumers of the database, which are typically
+carried out by different employees, in different job families. 
+
+## Retrieving Data
+
+Let's pivot to the user's side, in which
+the business analyst usually resides.
+
+Now that we have a database that contains some data, 
+how do we access the data?
+First, reopen the database (since we just closed it).
+Again, this will also create a database, if it does not already exist.
+
+```python
+con = sqlite3.connect('population.db')
+
+```
+
+As above, create a cursor object from which to execute SQL commands.
+
+```python
+cur = con.cursor()
+```
+
+This is the procedure you would follow to interact with an existing database.
+
+
+The primary command issued in SQL is a query. 
+The most common is the ```SELECT``` statement. 
+The basic form of a query is as follows. 
+
+```python 
+cur.execute('SELECT Column_1, Column_2 FROM Name_of_Table')
+```
+
+You pass the names of the columns you want to ```SELECT```
+and say which table you want them to be ```SELECT```ed from. 
+Notice that the command reads like the instructions you would
+give a person in English. 
+
+```python 
+>>> cur.execute('SELECT Region, Population FROM PopByRegion')
+<sqlite3.Cursor at 0x1e57ba16e30>
+``` 
+
+But it does not print anything interesting. 
+It only stores the result of the query in memory. 
+We can access the contents of the ```SELECT```ed table
+by reading parts of it from the cursor. 
+
+With the ```fetchone``` method, we can
+fetch one line at a time. 
+
+```python 
+>>> cur.fetchone()
+('Central Africa', 330993)
+``` 
+
+When you ```fetchone``` more line, you get the next line in the table:
+
+```python 
+>>> cur.fetchone()
+('Southeastern Africa', 743112)
+``` 
+
+
+If that is not enough for you, you can use the ```fetchall``` method, 
+to fetch all the rest.
+
+
+```python 
+>>> cur.fetchall()
+[('Northern Africa', 1037463), ('Southern
+Asia', 2051941), ('Asia Pacific', 785468), ('Middle East', 687630), 
+('Eastern Asia', 1362955), ('South America', 593121), ('Eastern Europe',
+223427), ('North America', 661157), ('Western Europe', 387933), ('Japan',
+100562)]
+``` 
+Notice that the first two lines were already fetched above. 
+The subsequent fetches start from the location of the cursor. 
+Since we have fetched all that the query has returned, 
+further fetches have nothing more to fetch.
+
+```python 
+>>> cur.fetchone()
+>>> cur.fetchall()
+[]
+``` 
+In this case, ```cur.fetchone()``` returns ```None``` and
+```cur.fetchall()``` returns an empty list. 
+
+
+Databases are not very interesting if you can only
+pull out what you put in. 
+You can also calculate functions of the variables in your database. 
+
+```python 
+>>> cur.execute('SELECT SUM(Population) FROM PopByRegion')
+>>> cur.fetchall()
+[(8965762,)]
+```
+
+One of the most common shortcuts is to use the 
+star, or asterisk, (```*```), which denotes a wildcard for the column names.
+```python 
+>>> cur.execute('SELECT * FROM PopByRegion')
+>>> cur.fetchall()
+[('Central Africa', 330993),
+ ('Southeastern Africa', 743112),
+ ('Northern Africa', 1037463),
+ ('Southern Asia', 2051941),
+ ('Asia Pacific', 785468),
+ ('Middle East', 687630),
+ ('Eastern Asia', 1362955),
+ ('South America', 593121),
+ ('Eastern Europe', 223427),
+ ('North America', 661157),
+ ('Western Europe', 387933),
+ ('Japan', 100562)]
+```
+
+This is a good go-to command to verify that your tables was created as you intended.
+Be careful! It can backfire for large examples, such as a query on an entire database.
+You might, however, use this on a small table that you have created with your query. 
+
+For now, we will focus on extracting the data. 
+If your data has to be in order, 
+use an ```ORDER BY``` clause to sort the output.
+
+```python 
+>>> cur.execute('SELECT Region, Population FROM PopByRegion ORDER BY Region')
+>>> cur.fetchall()
+[('Asia Pacific', 785468), ('Central Africa', 330993), ('Eastern Asia',
+1362955), ('Eastern Europe', 223427), ('Japan', 100562), ('Middle East',
+687630), ('North America', 661157), ('Northern Africa', 1037463), ('South
+America', 593121), ('Southeastern Africa', 743112), ('Southern Asia', 
+2051941), ('Western Europe', 387933)]
+``` 
+
+
+You can also sort in ````DESC````ending order...
+
+
+```python 
+>>> cur.execute('''SELECT Region, Population FROM PopByRegion
+                   ORDER BY Population DESC''')
+<sqlite3.Cursor object at 0x102e3e490>
+>>> cur.fetchall()
+[('Southern Asia', 2051941), ('Eastern Asia', 1362955), ('Northern Africa',
+1037463), ('Asia Pacific', 785468), ('Southeastern Africa', 743112), 
+('Middle East', 687630), ('North America', 661157), ('South America',
+593121), ('Western Europe', 387933), ('Central Africa', 330993), ('Eastern
+Europe', 223427), ('Japan', 100562)]
+
+``` 
+...or in ```ASC```ending order, if that is what you need. 
+
+
+Since we have all studied sorting algorithms, 
+we might be tempted to sort the returned list in Python. 
+Instead, sorting it within your SQL query takes advantage of the fact that
+entries in the database are stored in a particular order that makes it easier to sort. 
+Also, in practice, the database is usually housed on much more powerful computing system, 
+which is especially useful if you have large tables 
+that need to be sorted within intermediate calculations. 
+It is better to transfer the smallest file in its final form. 
+
+
+### Query Conditions
+
+Note that we referred to the use of the ```ORDER``` qualifier as a *clause*. 
+This is consistent with the notion that the statements are much like 
+instructions in the English language:
+extra qualifications are appended as clauses
+(although sometimes the query is more like a run-on sentence).
+
+You can select a subset of rows with the ```WHERE``` clause.
+This precedes a Boolean expression that uses one or more of 
+the following relational operators:
+```=```, ```!=```, ```>```, ```<```, ```>=```, and ```<=```. 
+All but the first have the same meaning as they do in Python. 
+There is no assignment operator ```=``` in SQL 
+(we did that with ```CREATE TABLE```, in some sense), 
+so the equals symbol is unambiguously a test of equality,  meaning the same as ```==``` in a Boolean expression in Python. 
+You might find that, in SQL, the meaning is easy to derive from the context, 
+since the commands are stated the way you would instruct someone to perform tasks, 
+much like you would in the English language. 
+
+```python 
+>>> cur.execute('SELECT Region FROM PopByRegion WHERE Population > 1000000')
+<sqlite3.Cursor object at 0x102e3e490>
+>>> cur.fetchall()
+[('Northern Africa',), ('Southern Asia',), ('Eastern Asia',)]
+
+``` 
+
+You can use logical operators such as ```AND```, ```OR```, and ```NOT``` 
+in the ```WHERE``` clause.
+These are used the same way one would use them in Python. 
+
+
+```python 
+>>> cur.execute('''SELECT Region FROM PopByRegion
+                   WHERE Population > 1000000 AND Region < "L"''')
+<sqlite3.Cursor object at 0x102e3e490>
+>>> cur.fetchall()
+[('Eastern Asia',)]
+
+``` 
+
+Notice how the ```<``` operator works on strings.
+Also note that we had to use two kinds of quotes
+in the above command:
+the query was passed in triple quotes, 
+while the string ```"L"``` in the Boolean expression
+was passed in double quotes within the larger string. 
+Since, with the ```sqlite3``` module, 
+the queries are passed as Python strings,
+you follow the same rules as you would for rendering 
+quotes within strings, 
+whenever the query contains strings. 
+
+
+
+## Updating and Deleting
+
+Databases change over time. 
+We learned how to ```INSERT VALUES``` in our database
+but that only operates one row at a time. 
+If we want to make larger changes, 
+we can use the ```UPDATE``` command to take advantage of
+the use of Boolean logic passed through a ```WHERE``` caluse. 
+
+```python 
+>>> cur.execute('SELECT * FROM PopByRegion WHERE Region = "Japan"')
 <sqlite3.Cursor object at 0x102e3e490>
 >>> cur.fetchone()
-(8965762,)
-
+('Japan', 100562)
 ```
+This the value recorded for Japan. 
+Now we can change it by updating.
 
-We can restrict the calculation to North America
-with a ```WHERE``` clause.
-
-```python
->>> cur.execute('''SELECT SUM (Population) FROM PopByCountry
-                   WHERE Region = "North America"''')
->>> cur.fetchall()
+```python 
+>>> cur.execute('''UPDATE PopByRegion SET Population = 100600
+                   WHERE Region = "Japan"''')
 <sqlite3.Cursor object at 0x102e3e490>
-[(661200,)]
-```
-
-and similarly for Eastern Asia.
-
-```python
->>> cur.execute('''SELECT SUM (Population) FROM PopByCountry
-                   WHERE Region = "Eastern Asia"''')
->>> cur.fetchall()
+>>> cur.execute('SELECT * FROM PopByRegion WHERE Region = "Japan"')
 <sqlite3.Cursor object at 0x102e3e490>
-[(1364389,)]
-```
+>>> cur.fetchone()
+('Japan', 100600)
 
+``` 
+As you can see the value was changed. 
+It would also work for all rows for which the columns 
+satisfy the Boolean expression in the ```WHERE``` clause. 
 
+Similarly, we can also ```DELETE``` records from the database.
 
-There exist several other commands, as in the following table.
-
-| Aggregate Function | Description
-| ------------------ | -----------------------------
-| AVG                | Average of the values
-| MIN                | Minimum value
-| MAX                | Maximum value
-| COUNT              | Number of non-NULL values
-| SUM                | Sum of the values
-
-There are many others that you might find online. 
-Note that the syntax may vary, depending
-on the dialect of SQL. 
-
-
-### Grouping
-
-
-Sometimes you want to tabulate results by category. 
-Aggregation commands can pass through a ```GROUP BY``` clause
-to perform a series of aggregate calculations by category. 
-
-Using the ```GROUP BY``` command, we can tabulate the sum of the population,
-for every category of ```Region```. 
-
-
-```python
->>> cur.execute('''SELECT Region, SUM (Population) FROM PopByCountry
-                   GROUP BY Region''')
+```python 
+>>> cur.execute('DELETE FROM PopByRegion WHERE Region < "L"')
+<sqlite3.Cursor object at 0x102e3e490>
+>>> cur.execute('SELECT * FROM PopByRegion')
 <sqlite3.Cursor object at 0x102e3e490>
 >>> cur.fetchall()
-[('Eastern Asia', 1364389), ('North America', 661200)]
+[('Southeastern Africa', 743112), ('Northern Africa', 1037463),
+ ('Southern Asia', 2051941), ('Middle East', 687630), ('South America',
+ 593121), ('North America', 661157), ('Western Europe', 387933)])]
 
+``` 
+As before, we can put them back, one row at a time. 
+
+```python 
+>>> cur.execute('INSERT INTO PopByRegion VALUES (?, ?)', ("Japan", 100562))
+``` 
+
+We can also delete all entries in the database, 
+including the table itself, by ```DROP```ping the ```TABLE```. 
+
+```python 
+>>> cur.execute('DROP TABLE PopByRegion')
+
+``` 
+
+Be careful with this one! There is no "Undo" button. 
+
+<img src="Images/little_bobby_tables.png" width="500">
+
+Can you understand what happened at the school?
+To understand why this is funny (if it is funny at all),
+imagine creating a string for a query to pull little Bobby's grades.
+```python
+student_names = "Robert'; DROP TABLE Students;"
+my_query_str = "SELECT grades FROM Students WHERE StudentName = '{0}';".format(student_name)
+cur.execute(my_query_str)
 ```
 
 
 
-### Self-Joins
 
-Now, let's consider the problem of comparing some values from a table
-to other values drawn from the same table. 
-This can be achieved using a *self-join*. 
-You treat two instances of tables drawn from the same root table
-as separate tables that can be joined together, 
-as you could with any other pair of tables. 
+## Using ```NULL``` for Missing Data
 
-Suppose we want to find pairs of countries whose populations 
-are close to each other--say, within 1,000 of each other. 
+Just like the value ```None``` in Python, 
+SQL provides a placeholder for missing values. 
+The missing keyword is ```NULL```. 
+Since we don't know the value of the population on Mars, we can enter
 
-Our first attempt might look like this: 
+```python 
+>>> cur.execute('INSERT INTO PopByRegion VALUES ("Mars", NULL)')
+
+``` 
+
+Sometimes, as the architect of the database, 
+you make this an impossibility. 
+You have seen the red starred fields in an online application before, 
+under name, address, etc. 
+Lurking in the background is a ```NOT NULL``` qualifier in the *schema*
+of the database. 
+
+```python 
+>>> cur.execute('CREATE TABLE Test (Region TEXT NOT NULL, '
+...             'Population INTEGER)')
+
+``` 
+It is much like a type contract with automated error handling
+to prevent any entries that are missing values in certain fields. 
+
+```python 
+>>> cur.execute('INSERT INTO Test VALUES (NULL, 456789)')
+Traceback (most recent call last):
+  File "<pyshell#45>", line 1, in <module>
+    cur.execute('INSERT INTO Test VALUES (NULL, 456789)')
+sqlite3.IntegrityError: Test.Region may not be NULL
+
+``` 
+This is fine because SQL gives you a precise error message
+but this may not be ideal because the entry is blocked. 
+In some cases, you might want to insert a particular value 
+such as ```0```, an empty string ```''``` or ```false```, 
+which could be used to represent different kinds of missing data. 
+Some databases use default codes, such as negative integers or 
+an unlikely value, such as ```-999990```. 
+Then it is up to the programmer 
+to handle the default or missing values downstream. 
+
+The treatment of ```NULL``` variables in SQL differs from 
+those in other languages, such as ```None``` in Python. 
+Of course, many operations involving ```NULL``` produce ```NULL```
+because if the input value is missing or unknown, 
+then so is the output value. 
+Logical operations are more complicated, however. 
+The Boolean expression ```NULL or 1``` produces 1, rather than ```NULL```, 
+for the following reasons:
+- If the first argument were false or zero, then the full expression would evaluate to 1. 
+- If the first argument were true or one, then the full expression would also evaluate to 1. 
+The technical term for this is *three-valued logic*. 
+In SQL, statements are not only true or false, they can be true, false or unknown. 
+Note also that different database formats might 
+have different ways of handling this sort of logic, 
+so the best practice is to test it on your particular infrastructure. 
 
 
-```python
->>> cur.execute('''SELECT Country FROM PopByCountry
-                   WHERE (ABS(Population - Population) < 1000)''')
-<sqlite3.Cursor object at 0x102e3e490>
->>> cur.fetchall()
-[('China',), ('DPR Korea',), ('Hong Kong (China)',), ('Mongolia',),
-('Republic of Korea',), ('Taiwan',), ('Bahamas',), ('Canada',),
-('Greenland',), ('Mexico',), ('United States',)]
 
+## Using Joins to Combine Tables
+
+So far, we have been limiting ourselves to a single table. 
+The main value of organizing data into a *relational database* is to 
+form relationships between data in other tables. 
+
+Let's create another table to experiment with the ways in which we can ```JOIN``` data.
+
+
+```python 
+>>> cur.execute('''CREATE TABLE PopByCountry(Region TEXT, Country TEXT, 
+                   Population INTEGER)''')
+
+``` 
+
+We could ```INSERT``` the ```VALUES``` one at a time, as with ```PopByRegion``` above:
+
+```python 
+>>> cur.execute('''INSERT INTO PopByCountry VALUES("Eastern Asia", "China", 
+                   1285238)''') 
+
+``` 
+
+It is easier if we pull the values from a list of tuples.
+
+```python 
+>>> countries = [("Eastern Asia", "DPR Korea", 24056), ("Eastern Asia", 
+"Hong Kong (China)", 8764), ("Eastern Asia", "Mongolia", 3407), ("Eastern 
+Asia", "Republic of Korea", 41491), ("Eastern Asia", "Taiwan", 1433), 
+("North America", "Bahamas", 368), ("North America", "Canada", 40876), 
+("North America", "Greenland", 43), ("North America", "Mexico", 126875), 
+("North America", "United States", 493038)]
 ```
 
-This is not what was wanted, for two reasons: 
-- First, the phrase ```SELECT Country``` is going to return only one country per record, but we want pairs of countries.
-- Second, Second, the expression 
-```(ABS(Population - Population) < 1000)``` is always going to return zero
-because it compares every population agains itself, line-by-line. 
-Since they will all be zero, the query will return all the country names in the table. 
 
+Now loop through those entries and ```INSERT``` the ```VALUES```.
 
-What we want to do is compare the population in each row with the populations 
-of countries in other rows. 
-To do this, we need to join ```PopByCountry``` with itself using an ```INNER JOIN```. 
-
-```python
->>> cur.execute('''
-SELECT A.Country, B.Country
-FROM   PopByCountry A INNER JOIN PopByCountry B
-WHERE  (ABS(A.Population - B.Population) <= 1000)
-AND    (A.Country != B.Country)''')
-<sqlite3.Cursor object at 0x102e3e490>
->>> cur.fetchall()
-[('Republic of Korea', 'Canada'), ('Bahamas', 'Greenland'), ('Canada',
-'Republic of Korea'), ('Greenland', 'Bahamas')]
-
+```python 
+>>> for c in countries:
+...   cur.execute('INSERT INTO PopByCountry VALUES (?, ?, ?)', (c[0], c[1], c[2]))
+... 
 ```
+As above, the commit method saves the changes.
 
-Notice that we used the absolute value function ```ABS()```. 
-Without this, the ```WHERE``` clause would also return other pairs
-of countries where the second country is much larger than the first, 
-i.e. where the difference ```A.Population - B.Population``` would be negative. 
+```python 
+>>> con.commit()
+
+``` 
+
+Often, you would not do this sort of operation in the console. 
+For large datasets, you will often prefer to collect the commands into a script. 
+The following script defines a database with a pair of tables. 
+
+```python 
+import sqlite3 as dbapi
+
+con = dbapi.connect('pop.db')
+cur = con.cursor()
+
+cur.execute('CREATE TABLE PopByRegion(Region TEXT, Population INTEGER)')
+
+cur.execute('INSERT INTO PopByRegion VALUES("Central Africa", 330993)')
+cur.execute('INSERT INTO PopByRegion VALUES("Southeastern Africa", 743112)')
+cur.execute('INSERT INTO PopByRegion VALUES("Northern Africa", 1037463)')
+cur.execute('INSERT INTO PopByRegion VALUES("Southern Asia", 2051941)')
+cur.execute('INSERT INTO PopByRegion VALUES("Asia Pacific", 785468)')
+cur.execute('INSERT INTO PopByRegion VALUES("Middle East", 687630)')
+cur.execute('INSERT INTO PopByRegion VALUES("Eastern Asia", 1362955)')
+cur.execute('INSERT INTO PopByRegion VALUES("South America", 593121)')
+cur.execute('INSERT INTO PopByRegion VALUES("Eastern Europe", 223427)')
+cur.execute('INSERT INTO PopByRegion VALUES("North America", 661157)')
+cur.execute('INSERT INTO PopByRegion VALUES("Western Europe", 387933)')
+cur.execute('INSERT INTO PopByRegion VALUES("Japan", 100562)')
+
+con.commit()
+
+cur.execute('CREATE TABLE PopByCountry(Region TEXT, Country TEXT, Population INTEGER)')
+
+countries = [("Eastern Asia", "China", 1285238), ("Eastern Asia", "DPR Korea", 24056), ("Eastern Asia", "Hong Kong (China)", 8764), ("Eastern Asia", "Mongolia", 3407), ("Eastern Asia", "Republic of Korea", 41491), ("Eastern Asia", "Taiwan", 1433), ("North America", "Bahamas", 368), ("North America", "Canada", 40876), ("North America", "Greenland", 43), ("North America", "Mexico", 126875), ("North America", "United States", 493038)]
+             
+for c in countries:
+    cur.execute('INSERT INTO PopByCountry VALUES (?, ?, ?)', (c[0], c[1],
+                c[2]))
+
+con.commit()
+``` 
 
 
-### Nested Queries
+In either case, once you have created the database (if it is a small example)
+you can see what you have created by running a ```SELECT``` ... ```fetchall()```
+set of commands. 
 
-
-Instead of pulling from a table, you can replace
-the name of a table with a query that produces the required table.
-
-Example: Select the list of regions that do not have
-a country with a population of 8,764,000.
-
-To make the example more clear, 
-let's remind ourselves what region that might be. 
 
 ```python
->>> cur.execute('''SELECT *
-                   FROM PopByCountry''')
-<sqlite3.Cursor object at 0x102e3e490>
+>>> cur.execute('''SELECT * FROM   PopByCountry''')
 >>> cur.fetchall()
 [('Eastern Asia', 'China', 1285238),
  ('Eastern Asia', 'DPR Korea', 24056),
@@ -175,607 +685,182 @@ let's remind ourselves what region that might be.
  ('North America', 'Greenland', 43),
  ('North America', 'Mexico', 126875),
  ('North America', 'United States', 493038)]
-
 ```
-When you include the ```WHERE``` clause to exclude Hong Kong, 
-it also excludes Hong Kong from the list of countries in that region. 
 
-```python
->>> cur.execute('''SELECT *
-                   FROM PopByCountry
-                   WHERE (PopByCountry.Population != 8764)''')
+Now we have a pair of related tables in our database. 
+We can join them by adding ```JOIN``` keywords after the ```FROM``` clause. 
+We can join data in several ways. 
+We will use ```INNER JOIN```s, ```LEFT JOIN```s and what are called self-joins. 
+
+In an ```INNER JOIN```, the syntax is as follows. 
+
+```python 
+>>> cur.execute('''
+SELECT Table1.Column1, Table2.ColumnX 
+FROM   Table1 INNER JOIN Table2 
+WHERE  (Table1.Column1 = Table2.Column1) 
+AND    (Table1.ColumnY > 1000000)
+''')
+<sqlite3.Cursor object at 0x102e3e490>
+
+``` 
+What does SQL do here?
+It executes the following three steps. 
+1. Construct the cross product of the tables
+1. Discard rows that do not meet the selection criteria
+1. Select columns from the remaining rows
+
+Now, let's repeat our query for the list of regions
+with high populations, 
+except we will list the countries in each region, 
+taking those from the new table, ```PopByCountry```. 
+
+```python 
+>>> cur.execute('''
+SELECT PopByRegion.Region, PopByCountry.Country 
+FROM   PopByRegion INNER JOIN PopByCountry 
+WHERE  (PopByRegion.Region = PopByCountry.Region) 
+AND    (PopByRegion.Population > 1000000)
+''')
 <sqlite3.Cursor object at 0x102e3e490>
 >>> cur.fetchall()
-[('Eastern Asia', 'China', 1285238),
- ('Eastern Asia', 'DPR Korea', 24056),
- ('Eastern Asia', 'Mongolia', 3407),
- ('Eastern Asia', 'Republic of Korea', 41491),
- ('Eastern Asia', 'Taiwan', 1433),
- ('North America', 'Bahamas', 368),
- ('North America', 'Canada', 40876),
- ('North America', 'Greenland', 43),
- ('North America', 'Mexico', 126875),
- ('North America', 'United States', 493038)]
+[('Eastern Asia', 'China'), ('Eastern Asia', 'DPR Korea'), 
+('Eastern Asia', 'Hong Kong (China)'), ('Eastern Asia', 'Mongolia'), 
+('Eastern Asia', 'Republic of Korea'), ('Eastern Asia', 'Taiwan')]
 
-```
-
-However, when you try to obtain the list of regions, 
-it still includes Eastern Asia
-because the other countries in Eastern Asia
-do not match the exclusion condition. 
+``` 
 
 
-```python
->>> cur.execute('''SELECT DISTINCT Region
-                   FROM PopByCountry
-                   WHERE (PopByCountry.Population != 8764)''')
+Another very popular option is a ```LEFT JOIN```, 
+which returns a row for *every* element of the first table
+(the *left* table) ,
+regardless of whether there is a corresponding row in the
+other table (the *right* table). 
+
+```python 
+>>> cur.execute('''
+SELECT PopByRegion.Region, PopByCountry.Country
+FROM   PopByRegion LEFT JOIN PopByCountry
+ON  (PopByRegion.Region = PopByCountry.Region)
+AND    (PopByRegion.Population > 1000000)
+''')
 <sqlite3.Cursor object at 0x102e3e490>
+
+>>> cur.fetchall()
+[('Central Africa', None),
+ ('Southeastern Africa', None),
+ ('Northern Africa', None),
+ ('Southern Asia', None),
+ ('Asia Pacific', None),
+ ('Middle East', None),
+ ('Eastern Asia', 'China'),
+ ('Eastern Asia', 'DPR Korea'),
+ ('Eastern Asia', 'Hong Kong (China)'),
+ ('Eastern Asia', 'Mongolia'),
+ ('Eastern Asia', 'Republic of Korea'),
+ ('Eastern Asia', 'Taiwan'),
+ ('South America', None),
+ ('Eastern Europe', None),
+ ('North America', None),
+ ('Western Europe', None),
+ ('Japan', None)]
+```
+Notice that the missing countries within other regions 
+are represented by ```None```, 
+since there is no value in the other table.
+
+
+To appreciate the difference between the two forms of joins, 
+let's reconsider the steps that SQL executes under these two types of joins. 
+An ```INNER JOIN``` comprises the following three steps. 
+1. Construct the cross product of the tables
+1. Discard rows that *are missing matching keys from both tables*
+1. Select columns satisfying the ```WHERE``` clause from the remaining rows
+
+In contrast, a ```LEFT JOIN``` comprises the following three steps. 
+1. Construct the cross product of the tables
+1. Discard rows that *are missing matching keys in the RIGHT table*
+1. Select columns from the remaining rows
+
+
+### Removing Duplicates
+
+Sometimes you only need to know the set of entries that uniquely satisfy
+certain conditions. 
+To achieve this, you remove duplicates. 
+Consider this example:
+
+```python 
+>>> cur.execute('''
+SELECT PopByRegion.Region
+FROM PopByRegion INNER JOIN PopByCountry
+WHERE (PopByRegion.Region = PopByCountry.Region)
+AND ((PopByCountry.Population * 1.0) / PopByRegion.Population > 0.10)''')
+<sqlite3.Cursor object at 0x102e3e490>
+>>> cur.fetchall()
+[('Eastern Asia',), ('North America',), ('North America',)]
+``` 
+
+Notice that the string ```'North America'``` appears twice. 
+Now repeat the query with the ```DISTINCT``` keyword
+after the ```SELECT``` command.
+
+```python 
+>>> cur.execute('''
+SELECT DISTINCT PopByRegion.Region
+FROM PopByRegion INNER JOIN PopByCountry
+WHERE (PopByRegion.Region = PopByCountry.Region)
+AND ((PopByCountry.Population * 1.0) / PopByRegion.Population > 0.10)''')
 >>> cur.fetchall()
 [('Eastern Asia',), ('North America',)]
 
-```
+``` 
+
+Now, only the unique values remain.
 
 
-As an intermediate step, create a query that creates a table that
-lists the Regions that do have a country with a population of 8,764,000.
+## Keys and Constraints
+
+Our query in the previous section relied on the fact that our regions and countries
+were uniquely identified by their names. 
+A column in a table that is used this way is called a *key*. 
+Your social security number, driver's license number and various customer numbers
+are all keys within databases. 
+Ideally, the values of the keys should be unique, 
+just like the words in a dictionary. 
+
+To tell the database to enforce this constraint, 
+we can use a ```PRIMARY KEY``` clause when we create the table. 
 
 
-```python
+```python 
+>>> cur.execute('''CREATE TABLE PopByRegion (
+                   Region TEXT NOT NULL, 
+                   Population INTEGER NOT NULL, 
+                   PRIMARY KEY (Region))''')
+``` 
+Sometimes your data are organized according to more than one value. 
+For example, your customer information on file at an online retailer
+will also reference invoice numbers and transaction numbers. 
+These can be used as multiple keys in some tables.
+
+Sometimes, however, the uniqueness of your records only holds
+in terms of combinations of several columns. 
+The ```CONSTRAINT``` keyword is used below
+to specify that no two entries in the table created below
+will ever have tha same values for region *and* country. 
+
+```python 
 >>> cur.execute('''
-SELECT DISTINCT Region
-FROM PopByCountry
-WHERE (PopByCountry.Population = 8764)
-''')
-<sqlite3.Cursor object at 0x102e3e490>
->>> cur.fetchall()
-[('Eastern Asia',)
+    CREATE TABLE PopByCountry(
+    Region TEXT NOT NULL,
+    Country TEXT NOT NULL,
+    Population INTEGER NOT NULL,
+    CONSTRAINT CountryKey PRIMARY KEY (Region, Country))''')
 
-```
 
-Then nest this query in the place of a table 
-within a nested query. 
+``` 
 
-```python
->>> cur.execute('''
-SELECT DISTINCT Region
-FROM PopByCountry
-WHERE Region NOT IN
-    (SELECT DISTINCT Region
-     FROM PopByCountry
-     WHERE (PopByCountry.Population = 8764))
-''')
-<sqlite3.Cursor object at 0x102e3e490>
->>> cur.fetchall()
-[('North America',)]
-
-```
-
-The bracketed expression is a query that produces a table, 
-which is then passed to the nesting query, 
-much like the way you pass a calculated expression as an argument 
-to another function.
-
-
-### Transactions
-
-A *transaction* is a series of database operations that are interdependent. 
-No operation can be committed unless every single operation 
-can be successfully be committed in sequence. 
-
-For example, processing payroll involves pairs of transactions: 
-withdrawing funds from the employer's account 
-and depositing funds in the employee's account. 
-By grouping the operations into a transaction, 
-it is guaranteed that either both operations occur or neither one does. 
-If the transaction fails, 
-all operations must be *rolled back*. 
-
-Imagine that a library has multiple copies of the same book. 
-It uses a computerized system to track its books by ISBN number. 
-When a patron signs out a book,
-a query is executed on the ```Books``` table to find out
-how many copies of the book are currently signed out
-and updates the count by one more copy. 
-
-```python
-cur.execute('SELECT SignedOut FROM Books WHERE ISBN = ?', isbn)
-signedOut = cur.fetchone()[0]
-cur.execute('''UPDATE Books SET SignedOut = ?
-               WHERE ISBN = ?''', signedOut + 1, isbn)
-cur.commit()
-
-```
-When a patron returns a book, the reverse happens. 
-
-```python
-cur.execute('SELECT SignedOut FROM Books WHERE ISBN = ?', isbn)
-signedOut = cur.fetchone()[0]
-cur.execute('''UPDATE Books SET SignedOut = ?
-               WHERE ISBN = ?''', signedOut - 1, isbn)
-cur.commit()
-
-```
-What if the library had two computers that handled book sign-outs and returns?
-Both computers would be connected to the same database. 
-What would happen if one computer tried to process a return while the other was
-trying to sign out a copy of the same book at the same time? 
-Computer A might send a query to count the number of books avaiable
-just before computer B, which will get the same value. 
-After computer A updates the count, computer B updates the count again, 
-without taking into account the transaction from Computer A, 
-which was done after Computer B sent the query. 
-The result is that the database only reflects 
-the transaction from Computer B. 
-
-
-```python
-Computer A: cur.execute('SELECT SignedOut FROM Books WHERE ISBN = ?', isbn)
-Computer A: signedOut = cur.fetchone()[0]
-Computer B: cur.execute('SELECT SignedOut FROM Books WHERE ISBN = ?', isbn)
-Computer B: signedOut = cur.fetchone()[0]
-Computer A: cur.execute('''UPDATE Books SET SignedOut = ?
-                           WHERE ISBN = ?''', signedOut + 1, isbn)
-Computer A: cur.commit()
-Computer B: cur.execute('''UPDATE Books SET SignedOut = ?
-                           WHERE ISBN = ?''', signedOut - 1, isbn)
-Computer B: cur.commit()
-
-```
-Fortunately, databases can detect such a pair of transactions and 
-would prevent Computer B from committing its transaction. 
-
-
-
-## Examples
-
-### Example 1: Population, Area and Population Density of Provinces
-
-In this example, we will create a table 
-to store the population and land area of the provinces and
-territories of Canada, according to the 2001 census with Statistics Canada. 
-
-
-
-a. Create a new database called ```census.db```.
- 
-```python
-import sqlite3 as dbapi
-con = dbapi.connect('census.db')
-```
-
-
-b. Make a database table called ```Density``` that will 
-hold the name of the province or territory (TEXT), 
-the population (INTEGER), 
-and the land area (REAL). 
-
-
-```python
-cur = con.cursor()
-cur.execute('''CREATE TABLE Density(Province TEXT,
- Population INTEGER, Area REAL)''')
-con.commit()
-```
-
-
-c. Insert the data from the table above. 
-
-```python
-table = [
- ('Newfoundland and Labrador', 512930, 370501.69),
- ('Prince Edward Island', 135294, 5684.39),
- ('Nova Scotia', 908007, 52917.43),
- ('New Brunswick', 729498, 71355.67),
- ('Quebec', 7237479, 1357743.08),
- ('Ontario', 11410046, 907655.59),
- ('Manitoba', 1119583, 551937.87),
- ('Saskatchewan', 978933, 586561.35),
- ('Alberta', 2974807, 639987.12),
- ('British Columbia', 3907738, 926492.48),
- ('Yukon Territory', 28674, 474706.97),
- ('Northwest Territories', 37360, 1141108.37),
- ('Nunavut', 26745, 1925460.18),
-]
-for row in table:
- cur.execute('INSERT INTO Density VALUES (?, ?, ?)', row)
-con.commit()
-```
-
-
-d. Retrieve the contents of the table.
-
-```python
-cur.execute('SELECT * FROM Density')
-for row in cur.fetchall():
- print(row)
-```
-
-The result is the following, which should match the table.
-
-```python
-('Newfoundland and Labrador', 512930, 370501.69)
-('Prince Edward Island', 135294, 5684.39)
-('Nova Scotia', 908007, 52917.43)
-('New Brunswick', 729498, 71355.67)
-('Quebec', 7237479, 1357743.08)
-('Ontario', 11410046, 907655.59)
-('Manitoba', 1119583, 551937.87)
-('Saskatchewan', 978933, 586561.35)
-('Alberta', 2974807, 639987.12)
-('British Columbia', 3907738, 926492.48)
-('Yukon Territory', 28674, 474706.97)
-('Northwest Territories', 37360, 1141108.37)
-('Nunavut', 26745, 1925460.18)
-
-```
-
-
-
-e. Retrieve the populations. 
-
-```python
-cur.execute('SELECT Population FROM Density')
-for row in cur.fetchall():
- print(row)
-```
-The result is a list of population figures.
-
-```python
-(512930,)
-(135294,)
-(908007,)
-(729498,)
-(7237479,)
-(11410046,)
-(1119583,)
-(978933,)
-(2974807,)
-(3907738,)
-(28674,)
-(37360,)
-(26745,)
-```
-
-f. Retrieve the provinces that have populations of less than one million. 
-
-```python
-cur.execute('''SELECT Province FROM Density
- WHERE Population < 1000000''')
-for row in cur.fetchall():
- print(row)
-```
-This is the list:
-
-```python
-('Newfoundland and Labrador',)
-('Prince Edward Island',)
-('Nova Scotia',)
-('New Brunswick',)
-('Saskatchewan',)
-('Yukon Territory',)
-('Northwest Territories',)
-('Nunavut',)
-```
-
-g. Retrieve the provinces that have populations of less than one million
-or greater than five million. 
-
-```python
-cur.execute('''SELECT Province FROM Density
- WHERE Population < 1000000
- OR Population > 5000000''')
-for row in cur.fetchall():
- print(row)
-```
-This returns the provinces in the above list
-with a few additional names.
-
-```python
-('Newfoundland and Labrador',)
-('Prince Edward Island',)
-('Nova Scotia',)
-('New Brunswick',)
-('Quebec',)
-('Ontario',)
-('Saskatchewan',)
-('Yukon Territory',)
-('Northwest Territories',)
-('Nunavut',)
-```
-
-h. Retrieve the provinces that *do not* have populations of less than one million
-or greater than five million. 
-
-```python
-cur.execute('''SELECT Province FROM Density
- WHERE NOT(Population < 1000000
- OR Population > 5000000)''')
-for row in cur.fetchall():
- print(row)
-```
-The remaining provinces are found here.
-
-```python
-('Manitoba',)
-('Alberta',)
-('British Columbia',)
-```
-
-i. Retrieve the populations of provinces that have a land area
-greater than 200,000 square kilometers. 
-
-```python
-cur.execute('''SELECT Population FROM Density
- WHERE Area > 200000''')
-for row in cur.fetchall():
- print(row)
-```
-Verify that these population figures match the criteria. 
-
-```python
-(512930,)
-(7237479,)
-(11410046,)
-(1119583,)
-(978933,)
-(2974807,)
-(3907738,)
-(28674,)
-(37360,)
-(26745,)
-```
-In practice, you cannot make this verification for large datasets
-but you could use this process to test it on a small sample. 
-
-j. Retrieve the provinces along with their population densities
-(population divided by land area). 
-
-```python
-cur.execute('SELECT Province, Population / Area FROM Density')
-for row in cur.fetchall():
- print(row)
-```
-Simply insert the formula in the place of the variable
-with the desired calculation. 
-
-```python
-('Newfoundland and Labrador', 1.384420135843375)
-('Prince Edward Island', 23.8009707286094)
-('Nova Scotia', 17.15893988048928)
-('New Brunswick', 10.223406212848959)
-('Quebec', 5.330521736115201)
-('Ontario', 12.570898175154742)
-('Manitoba', 2.0284583842743027)
-('Saskatchewan', 1.6689353978062142)
-('Alberta', 4.648229483118348)
-('British Columbia', 4.217776273802028)
-('Yukon Territory', 0.060403579075318826)
-('Northwest Territories', 0.03274009812056676)
-('Nunavut', 0.013890185981410428)
-
-```
-
-### Example 2: Population of Capital Cities
-
-Now add a new table called ```Capitals``` to the database. 
-```Capitals``` has three columns: 
-province/territory (TEXT),
-capital (TEXT), and population (INTEGER). 
-
-The first three lines depend on the situation. 
-We are continuing from above
-but if we started another session,
-we would have to reopen and reconnect to the database.
-
-```python
-import sqlite3 as dbapi
-con = dbapi.connect('census.db')
-cur = con.cursor()
-cur.execute('''CREATE TABLE Capitals(Province TEXT,
- Capital TEXT, Population INTEGER)''')
-con.commit()
-table = [
- ('Newfoundland and Labrador', "St. John's", 172918),
- ('Prince Edward Island', 'Charlottetown', 58358),
- ('Nova Scotia', 'Halifax', 359183),
- ('New Brunswick', 'Fredericton', 81346),
- ('Quebec', 'Qeubec City', 682757),
- ('Ontario', 'Toronto', 4682897),
- ('Manitoba', 'Winnipeg', 671274),
- ('Saskatchewan', 'Regina', 192800),
- ('Alberta', 'Edmonton', 937845),
- ('British Columbia', 'Victoria', 311902),
- ('Yukon Territory', 'Whitehorse', 21405),
- ('Northwest Territories', 'Yellowknife', 16541),
- ('Nunavut', 'Iqaluit', 5236),
-]
-for row in table:
- cur.execute('INSERT INTO Capitals VALUES (?, ?, ?)', row)
-con.commit()
-
-```
-
-a. Retrieve the contents of the table. 
-
-```python
-cur.execute('SELECT * FROM Capitals')
-for row in cur.fetchall():
- print(row)
-```
-Again, the star wildcard gets all the columns. 
-
-```python
-('Newfoundland and Labrador', "St. John's", 172918)
-('Prince Edward Island', 'Charlottetown', 58358)
-('Nova Scotia', 'Halifax', 359183)
-('New Brunswick', 'Fredericton', 81346)
-('Quebec', 'Qeubec City', 682757)
-('Ontario', 'Toronto', 4682897)
-('Manitoba', 'Winnipeg', 671274)
-('Saskatchewan', 'Regina', 192800)
-('Alberta', 'Edmonton', 937845)
-('British Columbia', 'Victoria', 311902)
-('Yukon Territory', 'Whitehorse', 21405)
-('Northwest Territories', 'Yellowknife', 16541)
-('Nunavut', 'Iqaluit', 5236)
-```
-
-b. Retrieve the populations of the provinces and capitals 
-(in a list of tuples of the form 
-```[province_population, capital_population]```). 
-
-```python
-cur.execute('''SELECT Density.Population, Capitals.Population
- FROM Capitals INNER JOIN Density
- WHERE Capitals.Province = Density.Province''')
-for row in cur.fetchall():
- print(row)
-```
-This pulls pairs of population figures
-from provinces and capital cities.
-
-```python
-(512930, 172918)
-(135294, 58358)
-(908007, 359183)
-(729498, 81346)
-(7237479, 682757)
-(11410046, 4682897)
-(1119583, 671274)
-(978933, 192800)
-(2974807, 937845)
-(3907738, 311902)
-(28674, 21405)
-(37360, 16541)
-(26745, 5236)
-```
-
-c. Retrieve the land area of the provinces whose capitals 
-have populations greater than 100,000. 
-
-```python
-cur.execute('''SELECT Density.Area
- FROM Capitals INNER JOIN Density
- WHERE Capitals.Province = Density.Province
- AND Capitals.Population > 100000''')
-for row in cur.fetchall():
- print(row)
-```
-This returns 
-
-```python
-(370501.69,)
-(52917.43,)
-(1357743.08,)
-(907655.59,)
-(551937.87,)
-(586561.35,)
-(639987.12,)
-(926492.48,)
-```
-
-
-d. Retrieve the provinces with land densities
-less than two people per square kilometer
-and capital city populations more than 500,000. 
-
-
-```python
-cur.execute('''SELECT Density.Province
- FROM Capitals INNER JOIN Density
- WHERE Capitals.Province = Density.Province
- AND Density.Population / Density.Area < 2
- AND Capitals.Population > 500000''')
-for row in cur.fetchall():
- print(row)
-```
-
-
-```python
-
-```
-Notice that This query doesn't return any results.
-
-e. Retrieve the total land area of Canada. 
-
-```python
-cur.execute('SELECT SUM(Area) FROM Density')
-print(cur.fetchone())
-```
-
-```python
-(9012112.19,)
-```
-
-We can use ```fetchone()``` because there is only one item to fetch. 
-
-f. Retrieve the average population of the capital cities. 
-
-```python
-cur.execute('SELECT AVG(Population) FROM Capitals')
-print(cur.fetchone())
-```
-
-```python
-(630343.2307692308,)
-```
-
-Again, sometimes the answer is a single number. 
-
-g. Retrieve the lowest population of the capital cities. 
-
-```python
-cur.execute('SELECT MIN(Population) FROM Capitals')
-print(cur.fetchone())
-```
-Iqualuit, way up North in Nunavut
-is the capital city with the smallest population. 
-
-```python
-(5236,)
-```
-
-h. Retrieve the highest population of the provinces or territories. 
-
-```python
-cur.execute('SELECT MAX(Population) FROM Density')
-print(cur.fetchone())
-```
-
-Ontario is the province with the largest population in Canada. 
-
-```python
-(11410046,)
-```
-
-i. Retrieve the provinces that have land densities within 0.5 persons per square kilometer of one another. 
-Have each pair of provinces reported only once. 
-
-```python
-cur.execute('''SELECT A.Province, B.Province
- FROM Density A INNER JOIN Density B
- WHERE A.Province < B.Province
- AND ABS(A.Population / A.Area - B.Population / B.Area) <
-0.5''')
-for row in cur.fetchall():
- print(row)
-```
-
-These are the pairs of provinces with densities of similar magnitudes. 
-
-```python
-('Newfoundland and Labrador', 'Saskatchewan')
-('Manitoba', 'Saskatchewan')
-('Alberta', 'British Columbia')
-('Northwest Territories', 'Yukon Territory')
-('Northwest Territories', 'Nunavut')
-('Nunavut', 'Yukon Territory')
-```
-
-There are many more examples of calculations you could perform. 
-This is just a taste. 
-In practice, the true value of the ability to work with databases, 
-at least for a Business Analyst, 
-is in the ability to make datasets to study with statistical models. 
-
-
+In practice, databases are often designed to use integers as keys. 
+This way, the integers can be generated to satisfy the uniqueness constraints
+and it avoids any complications from having two entries with, say, the same name. 

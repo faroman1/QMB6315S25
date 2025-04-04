@@ -48,7 +48,15 @@ Students should have taken a course in linear regression modelling, such as ECO6
 *Business Data Science: Combining Machine Learning and Economics to Optimize, Automate, and Accelerate Business Decisions, 1st Edition* by Matt Taddy. McGraw-Hill: New York, NY, 2019 (ISBN-13: 978-1260452778 ISBN-10: 1260452778)
 
 
-*Practical Programming* is the main text for the course. We will progress through the chapters of that book in a nearly linear fashion. The textbook *Business Data Science* will be used as a source of examples of business problems and data that are used in applications of business analytics. Even though these examples are written in the statistical programming language R, the calculations can be performed in Python with the skills learned in Practical Programming.
+*Practical Programming* is the main text for the course. We will progress through the chapters of that book in a nearly linear fashion. 
+*A Gentle Introduction to Effective Computing*, by Paarsch and Golyaev, 
+is an exhaustive reference to computing for business analytics. 
+The level is fairly aspirational for a short course, however, it is a collection of topics that 
+you may learn throughout your career. 
+*Python for Data and Analytics* is a reference with examples of applications for business
+and would be a good reference for a self-contained course in Python for business analytics; 
+however, we will cover other relevant topics in business analytics in the sequel to this course. 
+The textbook *Business Data Science* can be used as a source of examples of business problems and data that are used in applications of business analytics. Even though these examples are written in the statistical programming language R, the calculations can be performed in Python with the skills learned in Practical Programming.
 
 
 ## Software
