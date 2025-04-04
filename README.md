@@ -35,11 +35,11 @@ Students should have taken a course in linear regression modelling, such as ECO6
 
 ### Recommended
 
-<img src="Images/Business_DS_Book_Cover.png" width="200"/>
+<img src="Images/PG_Book_Cover.png" width="200"/>
 
 *A Gentle Introduction to Effective Computing in Quantitative Research: What Every Research Assistant Should Know* by Konstantin Golyaev and Harry J. Paarsch. Cambridge, MA:MIT Press, 2015 (ISBN-10: 9780262034111, ISBN-13: 978-0262034111) 
 
-<img src="Images/Business_DS_Book_Cover.png" width="200"/>
+<img src="Images/PG_Book_Cover.png" width="200"/>
 
 *Python for Data and Analytics* by Daniel H. Groner. Prospect Press, Burlington, VT, (eBook: ISBN: 978-1-943153-98-5, paperback: ISBN 978-1-943153-99-2)
 
