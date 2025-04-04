@@ -8,23 +8,21 @@ QMB3311: Python for Business Analytics
 
 ## Course Description
 
-The objective of this course is to teach you to solve quantitative problems using the Python programming language. It is designed for students interested in pursuing a career in business analytics. You will learn how to design computer programs that read data, manipulate data, perform calculations with data and apply these to problems in business analytics. 
+This course is the second of a two-part series designed to introduce you to the main tools of business analytics. We will learn to write computer programs in Python, a language commonly used for data engineering and data science. We will use Python to obtain and organize data from databases using SQL. We will learn how to process data and estimate models, using the many useful modules and packages available in Python. We will continue to use GitHub, a version control system, to track your progress in software development.
 
 ## Learning Objectives
 
 After completing this course, the student is expected to be able to: 
 -	understand the types of data in Python and the corresponding operations,
 -	use Python modules to solve problems,
--	write new functions and modules,
--	understand and implement calculations using linear algebra,
--	prepare and analyze data to solve a business problem and
--	understand how numerical calculations on the computer differ from written calculations.
+-	write new functions in Python,
+-	obtain a data set from a database using SQL,
+-	prepare and analyze data to solve a business problem.
+
 
 ## Enrollment Requirements
 
-The formal requirements include QMB 3003 and QMB 3200, Quantitative Business Tools I and II. 
-The true requirement, however, is a quantitative mindset. Computer programming is a quantitative exercise and is suitable for those with an interest in quantitative problem solving. 
-
+Students should have taken a course in linear regression modelling, such as ECO6416, and an introductory course in programming, such as QMB 6316; however, the main requirement is a quantitative mindset. Computer programming is a quantitative exercise and is suitable for those with an interest in quantitative problem solving.
 
 
 ## Textbooks
@@ -36,6 +34,14 @@ The true requirement, however, is a quantitative mindset. Computer programming i
 *Practical Programming: An Introduction to Computer Science Using Python 3.6, 3rd Edition* by Paul Gries, Jennifer Campbell, Jason Montojo. The Pragmatic Bookshelf: Raleigh, NC, 2017 (ISBN-13: 978-1680502688, ISBN-10: 1680502689).
 
 ### Recommended
+
+<img src="Images/Business_DS_Book_Cover.png" width="200"/>
+
+*A Gentle Introduction to Effective Computing in Quantitative Research: What Every Research Assistant Should Know* by Konstantin Golyaev and Harry J. Paarsch. Cambridge, MA:MIT Press, 2015 (ISBN-10: 9780262034111, ISBN-13: 978-0262034111) 
+
+<img src="Images/Business_DS_Book_Cover.png" width="200"/>
+
+*Python for Data and Analytics* by Daniel H. Groner. Prospect Press, Burlington, VT, (eBook: ISBN: 978-1-943153-98-5, paperback: ISBN 978-1-943153-99-2)
 
 <img src="Images/Business_DS_Book_Cover.png" width="200"/>
 
@@ -110,3 +116,8 @@ As a junior job-seeker, fresh out of college,
 your goal should be to find a position *somewhere* on this landscape
 and then make sure your on-the-job performance record
 will open the doors to the next position. 
+This may be as some responsible for analyzing data, such as a statistician, 
+data analyst, or data scientist, or someone responsible for preparing data, 
+such as a data analyst or data engineer. 
+As a senior job-seeker, you might be charged with managing a team of 
+statisticians, data scientists, or data engineers, who apply these skills to solve business problems.
