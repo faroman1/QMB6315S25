@@ -1,6 +1,6 @@
 # QMB6315S25
 
-QMB3311: Python for Business Analytics
+QMB6315: Python for Business Analytics
 
 
 <img src="Images/python_for_Business_Analytics.png" width="500"/>

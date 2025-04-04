@@ -1,11 +1,9 @@
 
 # Chapter 17: Databases
 
-In the last lecture, we learned about dictionaries as a precursor to 
-this chapter about databases. 
-I went through the following examples of databases in which
+All of us have some inteaction with databases in which
 your very own information is stored. 
-For example, the IRS keeps a record of your tax imformation by 
+For example, the IRS keeps a record of your tax information by 
 recording amounts in the fields of your tax return, 
 your vital statistics, and the primary key is your social security number. 
 If you have a driver's license, the DMV keeps a record of your vehicles, 
