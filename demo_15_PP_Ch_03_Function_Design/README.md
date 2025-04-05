@@ -1,6 +1,6 @@
 # Chapter 3, Part B: Designing Functions
 
-
+Let's take a closer look at the function design recipe we encountered in Module 1.
 
 ## Designing New Functions: A Recipe
 

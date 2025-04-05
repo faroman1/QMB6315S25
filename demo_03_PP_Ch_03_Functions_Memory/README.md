@@ -426,3 +426,318 @@ Python keeps track of all the intermediate calculations
 in separate places in memory, one for each of the different ```x```'s above.
 
 
+# Chapter 3, Part B: Designing Functions
+
+
+
+## Designing New Functions: A Recipe
+
+
+
+In this demo, we will study the process of designing functions. 
+We will follow the 5-step process in the textbook *Practical Programming*, 
+Chapter 3, called the *Function Design Recipe*. 
+It is called a recipe because it guides you to follow a systematic approach to designing your function. 
+Every time you write a function, you need to answer the following questions:
+
+* What do you name the function? 
+* What are the arguments, and what types of information do they represent?
+* What calculations does the function do with that information?
+* What does the function return?
+* Does the function work as expected?
+
+You will address these questions by following the recipe shown next. 
+
+## The Function Design Recipe
+
+The five steps are as follows:
+
+1. **Examples** Type a few example calls and determine what the function should return for those values. 
+The examples define a name of your function that should indicate what is being calculated in your examples. 
+1. **Description** Write one or more sentences to describe what your function does. 
+1. **Header** Type some documentation relating to your function. 
+It should be clear to the reader what arguments it takes as input, what value is returned and the type of each variable. 
+1. **Body** By now, you should be clear about how your function will work. 
+Now type the code to perform the calculations. 
+1. **Test** Run the examples from step 1 to verify that your function works as expected. 
+
+
+## Function Design Example
+
+
+Consider the simple example of the function ```add_two_numbers``` that, well, adds two numbers.
+
+```python
+# Define a function without documentation.
+>>> def add_two_numbers(first_number, second_number):
+...    
+...    total = first_number + second_number
+...    
+...    return total
+...
+...
+```
+
+The function is fine but how does the user know how it works. 
+Guessing is only reasonable if the function is simple. 
+
+```python
+>>> add_two_numbers(3,4)
+7
+```
+
+That makes sense and it appears to work. 
+If your users want to know for sure, they can
+search for documentation, as they would for any other function.
+
+```python
+>>> help(add_two_numbers)
+Help on function add_two_numbers in module __main__:
+
+add_two_numbers(first_number, second_number)
+```
+There's nothing there yet.
+
+You could print the entire function object but that
+is not very convenient for long and complex functions.
+```python
+>>> add_two_numbers
+<function __main__.add_two_numbers(first_number, second_number)>
+```
+
+Instead, add documentation to the function in a docstring, 
+which is a string of text enclosed in triple quotes
+at the top of the function.
+
+
+```python
+>>> def add_two_numbers(first_number, second_number):
+...    """ Add two numbers together and return the sum.
+...    
+...    """
+...    
+...    total = first_number + second_number
+...    
+...    return total
+...
+```
+
+
+
+Now test the documentation by calling for help:
+```python
+>>> help(add_two_numbers)
+Help on function add_two_numbers in module __main__:
+
+add_two_numbers(first_number, second_number)
+    Add two numbers together and return the sum.
+```
+
+Notice the content from the description in the docstring.
+
+We can improve the docstring by including examples,
+so now let's cover all of these step by following
+the *function design recipe*.
+
+
+
+## Function Design Recipe
+
+Now apply the function design recipe to the ```add_two_numbers``` example.
+
+### Examples
+
+Try to think of some examples that will test the limits of your function.
+Note that we can run the tests only because we have already defined the
+function in the examples above.
+
+```python
+>>> add_two_numbers(3,4)
+7
+>>> add_two_numbers(0,4)
+4
+>>> add_two_numbers(-3,3)
+0
+
+```
+
+Now you know that your function will have a form like this.
+
+```python
+>>> def add_two_numbers(first_number, second_number):
+...    
+...    
+...    
+...    return total
+...
+...
+```
+In mathematics, it is common to use Roman and Greek letters of the
+alphabet to define the arguments to your function. 
+In contrast, in computer programming it is customary to define names that
+are more descriptive. 
+For example, a function that estimates a linear regression model
+might have a type contract such as 
+
+```python
+>>> def linear_reg(y, x):
+...    
+...    # Calculate beta_hat.
+...    
+...    return beta_hat
+...
+...
+```
+
+Notice that you would not enter Greek letters such as &alpha; or &beta; 
+in your script because that would require a larger set of characters
+and cause bugs on some platforms. 
+You might, however, elect to define variable names that spell
+out these symbols if it matches the related terminology. 
+For maximum functionality, keep your code within the Roman alphabet, 
+possibly using underscores for spaces and numbers to differentiate variables. 
+
+
+### Header
+
+Write a header to contain information about the
+the types of variables in your function.
+
+
+```python
+>>> def add_two_numbers(first_number: float, second_number: float) -> float:
+...    
+...    
+...    
+...    return total
+...
+...
+```
+The header contains a *type contract* that not only defines 
+the names of the variables but also the types of the variables
+passed as arguments and returned by the function. 
+
+
+### Description
+
+Add a description of what your function does, in words.
+Include the list of your examples.
+
+```python
+>>> def add_two_numbers(first_number: float, second_number: float) -> float:
+...    """ Add two numbers together and return the sum.
+...    >>> add_two_numbers(3,4)
+...    7
+...    >>> add_two_numbers(0,4)
+...    4
+...    >>> add_two_numbers(-3,3)
+...    0
+...    """
+...    
+...    
+...    return total
+...
+...
+```
+
+Note the particular format of the examples:
+the function call is preceded by the string 
+```>>> ``` (with a trailing space)
+and the next line contains the output expected.
+Although following convention is important 
+for the convenience of you users, 
+this format allows for automated testing of your function
+using the examples you provide. 
+
+### Body
+
+In this case, the body is simple; however, this is often the most work
+in designing a function. 
+For more complex functions, 
+following the previous steps will clarify your understanding 
+of the function before you write the body that performs the calculation. 
+
+
+```python
+>>> def add_two_numbers(first_number: float, second_number: float) -> float:
+...    """ Add two numbers together and return the sum.
+...    >>> add_two_numbers(3,4)
+...    7
+...    >>> add_two_numbers(0,4)
+...    4
+...    >>> add_two_numbers(-3,3)
+...    0
+...    """
+...    
+...    total = first_number + second_number
+...    
+...    return total
+...
+...
+```
+
+This may seems like a lot of work to do to prepare to write one line of code.
+With more elaborate functions, having clearly stated the 
+examples, header and description, 
+you should be clear about what it is you will compute and the planning will pay off. 
+Think of these steps as you would when you write an outline for an essay:
+even very talented writers rarely write a passage from beginning to end.
+Instead, most writers start with a plan for what they want to write
+before they write it. 
+
+
+### Test
+
+Finally, test your functions to confirm accuracy. 
+
+```python
+>>> add_two_numbers(3,4)
+7
+>>> add_two_numbers(0,4)
+4
+>>> add_two_numbers(-3,3)
+0
+
+```
+
+If all goes well, these examples should all return
+the values you expect.
+If not, be sure that your examples are correct
+or modify your function definition.
+Most of the work in coding is detecting your mistakes
+and correcting them.
+
+
+## Tips
+
+You will get better at writing functions as you gain more experience but the following tips can help you improve more quickly. 
+* Start off with a simple case. 
+  * Save the corner cases for after your base cases work. 
+* Start off with a simple approach.
+  * You can adjust the code for faster computation once it is working. 
+* Type the comments first.
+  * Describe to the first user (you!) how the calculations will be performed. 
+  * For lengthier calculations, 
+  split the calculation into checkpoints where you can determine the format 
+  of intermediate calculations.
+  * Type in the code one block at a time. 
+  * Assign values to the arguments (but hide them in comments, so as not to interfere) 
+  and run blocks of code in the IDE to test one section at a time.
+* If you find it is getting too complicated, consider breaking up the calculation 
+into separate parts.  
+  * Is there a natural checkpoint where you can test with examples? 
+  * Should you consider splitting up the function into separate functions?
+* Choose examples that provide good testing cases. 
+  * Does your function work with negative values? 
+  * Does it work with missing values? 
+  * Does it work with the wrong data types? 
+  * Are there any knife-edge cases when the procedure will change? 
+  * Are there any obvious boundaries?
+* After making any significant changes to a partially-working function, 
+re-run all of your test cases to make sure they are still correct.
+  * Did you break any of the test cases that were working before?
+  * Did you fix any that were not working? 
+  * Keeping score is good motivation.
+  * With regular testing, you can make changes with more confidence. 
+
+
