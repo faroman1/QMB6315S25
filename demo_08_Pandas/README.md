@@ -277,3 +277,10 @@ You can also write to an Excel worksheet.
 >>> pd.read_excel('file.xlsx')
 >>> pd.to_excel('dir/myDataFrame.xlsx',  sheet_name='Sheet1')
 ```
+
+
+## Application
+
+Now we can apply these tools to read and join several datasets
+to estimate a regression model. 
+
