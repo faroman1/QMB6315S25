@@ -31,7 +31,7 @@ def variance(x):
     12.5
     >>> variance([99,101,99,101,99,101])
     1.2
-    >>> variance([])
+    >>> variance([4,4,4,4])
     0.0
     
     """
@@ -40,11 +40,10 @@ def variance(x):
     x_bar = sum(x)/n # Modify this line.
     
     var = 0 # Modify this line.
-    for i in range(0,n):
+    for i in range(0, n):
         var = var + (x[i] - x_bar)**2
-        
-        var = var/(n-1)
-        
+    
+    var = var/(n-1)
     return var
 
 
@@ -74,13 +73,12 @@ def covariance(y, x):
     n = len(x) # Modify this line.
     x_bar = sum(x)/n # Modify this line.
     y_bar = sum(y)/n # Modify this line.
-   
-    var = 0 # Modify this line.
-    for i in range(0,n):
-        var = var + (y[i] - y_bar)*(x[i] - x_bar)
-        
-        var = var/(n-1)
     
+    var = 0 # Modify this line.
+    for i in range(0, n):
+        var = var + (y[i] - y_bar)*(x[i] - x_bar)
+    
+    var = var/(n-1)
     return var
 
 
@@ -109,13 +107,13 @@ def ols_slope(y, x):
     
     """
     
+ 
     covar = covariance(y, x) # Modify this line.
     var = variance(x) # Modify this line.
     
     slope = covar/var # Modify this line.
     
     return slope
-
 
 ##################################################
 # Part d) Intercept
@@ -170,8 +168,10 @@ def ssr(y, x, beta_0, beta_1):
 
     """
     
-    ssr = 7 # Modify this line.
-    ssr = 8 # Modify this line.
+    ssr = 0
+    for i in range(len(y)):
+        residual = y[i] - beta_0 - beta_1 * x[i]
+        ssr = ssr + residual** 2
     
     return ssr
 
