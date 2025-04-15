@@ -2,7 +2,7 @@
 """
 ##################################################
 # 
-# QMB 3311: Python for Business Analytics
+# QMB 6315: Python for Business Analytics
 # 
 # Using Databases with SQLite3
 # 
@@ -12,7 +12,7 @@
 # College of Business Administration
 # University of Central Florida
 # 
-# April 12, 2021
+# April 15, 2025
 # 
 # More Examples with SQL and Databases
 # Using SQL Scripts
@@ -42,14 +42,24 @@ import csv # To import tables from csv files
 ##################################################
 
 
+
 # Find out the current directory.
 os.getcwd()
+
+# Get the path where you saved this script.
+# This only works when you run the entire script (with the green "Play" button or F5 key).
+print(os.path.dirname(os.path.realpath(__file__)))
+# It might be comverted to lower case, but it gives you an idea of the text of the path. 
+# You could copy it directly or type it yourself, using your spelling conventions. 
+
 # Change to a new directory.
-drive_path = 'C:\\Users\\le279259\\OneDrive - University of Central Florida\\Documents\\'
-git_path = 'GitHub\\QMB3311S22\\'
-os.chdir(drive_path + git_path + 'demo_25_Databases')
+
+# You could set it directly from the location of this file
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
 # Check that the change was successful.
 os.getcwd()
+
 
 
 ##################################################

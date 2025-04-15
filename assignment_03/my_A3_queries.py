@@ -2,29 +2,19 @@
 """
 ##################################################
 # 
-# QMB 3311: Python for Business Analytics
+# QMB 6315: Python for Business Analytics
 # 
 # Using Databases with SQLite3
 # 
 # Lealand Morin, Ph.D.
 # Assistant Professor
 # Department of Economics
-# College of Business
+# College of Business Administration
 # University of Central Florida
 # 
-# April 6, 2021
+# April 12, 2025
 # 
-# Chapter 17: Databases
-# Part B: Advanced Features
-# 
-# This program provides examples of SQL commands
-# including creating tables, selecting data, 
-# joining data and aggregating data.
-# 
-# This example mimics an example 
-# in the textbook *Practical Programming*, 
-# except that the example is based on US population
-# and land area.
+# Sample Program for Assignment 3
 # 
 ##################################################
 """
@@ -48,12 +38,18 @@ import sqlite3 # To pass SQL queries to a database
 
 # Find out the current directory.
 os.getcwd()
+
+# Get the path where you saved this script.
+# This only works when you run the entire script (with the green "Play" button or F5 key).
+print(os.path.dirname(os.path.realpath(__file__)))
+# It might be comverted to lower case, but it gives you an idea of the text of the path. 
+# You could copy it directly or type it yourself, using your spelling conventions. 
+
 # Change to a new directory.
-# git_path = 'C:\\Users\\le279259\\Documents\\Teaching\\ECP3004_Spring_2021\\GitRepo\\ECP3004S21\\'
-# os.chdir(git_path + 'assignment_08')
-drive_path = 'C:\\Users\\le279259\\OneDrive - University of Central Florida\\Documents\\'
-git_path = 'GitHub\\QMB3311S22\\'
-os.chdir(drive_path + git_path + 'demo_24_PP_Ch_17_Databases')
+
+# You could set it directly from the location of this file
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
 # Check that the change was successful.
 os.getcwd()
 
@@ -64,7 +60,7 @@ os.getcwd()
 ##################################################
 
 #--------------------------------------------------
-### Example 1: Population, Area and Population Density 
+### Question 1: Population, Area and Population Density 
 ###     of US States and Territories
 #--------------------------------------------------
 
@@ -73,13 +69,13 @@ os.getcwd()
 # territories of the United States. 
 
 
-# a. Create a new database called US_population.db.
+# a. Create a new database called population.db.
 
 # You would import some kind of API 
 # to interact with the database
 # We will continue using sqlite3
 import sqlite3 as dbapi
-con = dbapi.connect('US_population.db')
+con = dbapi.connect('population_USA.db')
 
 
 
@@ -97,21 +93,11 @@ con.commit()
 
 # c. Insert the data from the table above. 
 
-# The hard way, following the examples in the text:
+# The hard way, which we did in class:
 # table = [
-#  ('Newfoundland and Labrador', 512930, 370501.69),
-#  ('Prince Edward Island', 135294, 5684.39),
-#  ('Nova Scotia', 908007, 52917.43),
-#  ('New Brunswick', 729498, 71355.67),
-#  ('Quebec', 7237479, 1357743.08),
-#  ('Ontario', 11410046, 907655.59),
-#  ('Manitoba', 1119583, 551937.87),
-#  ('Saskatchewan', 978933, 586561.35),
-#  ('Alberta', 2974807, 639987.12),
-#  ('British Columbia', 3907738, 926492.48),
-#  ('Yukon Territory', 28674, 474706.97),
-#  ('Northwest Territories', 37360, 1141108.37),
-#  ('Nunavut', 26745, 1925460.18),
+#  ('Alaska', 123, 45678),
+#  ...
+#  ('Wyoming', 123, 45678),
 # ]
 
 # The easy way:
@@ -133,24 +119,28 @@ density_df.columns
 
 # Loop through the rows of the dataframe to INSERT the VALUES.
 for row in density_df.index:
-    # print(density_df['state_terr', 'population', 'area']][row])
-    cur.execute('INSERT INTO Density VALUES (?, ?, ?)', 
+   cur.execute('INSERT INTO Density VALUES (?, ?, ?)', 
                (str(density_df['state_terr'][row]), 
-                int(str(density_df['population'][row]).replace(',', '')), 
-                float(str(density_df['area'][row]).replace(',', '')) ))
+                int(density_df['population'][row]), 
+                float(density_df['area'][row]) ))
 con.commit()
 
 
+
+#--------------------------------------------------
+# Fill in the following queries.
+#--------------------------------------------------
+
 # d. Retrieve the contents of the table.
 
-cur.execute('SELECT * FROM Density')
+cur.execute('QUERY GOES HERE')
 for row in cur.fetchall():
  print(row)
 
 
 # e. Retrieve the populations. 
 
-cur.execute('SELECT Population FROM Density')
+cur.execute('QUERY GOES HERE')
 for row in cur.fetchall():
  print(row)
 
@@ -159,8 +149,7 @@ for row in cur.fetchall():
 # f. Retrieve the states that have populations of less than one million. 
 
 
-cur.execute('''SELECT State FROM Density
- WHERE Population < 1000000''')
+cur.execute('QUERY GOES HERE')
 for row in cur.fetchall():
  print(row)
 
@@ -169,9 +158,7 @@ for row in cur.fetchall():
 # or greater than five million. 
 
 
-cur.execute('''SELECT State FROM Density
- WHERE Population < 1000000
- OR Population > 5000000''')
+cur.execute('QUERY GOES HERE')
 for row in cur.fetchall():
  print(row)
 
@@ -180,31 +167,10 @@ for row in cur.fetchall():
 # or greater than five million. 
 
 
-cur.execute('''SELECT State FROM Density
- WHERE NOT(Population < 1000000
- OR Population > 5000000)''')
+cur.execute('QUERY GOES HERE')
 for row in cur.fetchall():
  print(row)
 
-
-# i. Retrieve the populations of states that have a land area
-# greater than 200,000 square miles. 
-
-
-cur.execute('''SELECT Population FROM Density
- WHERE Area > 200000''')
-for row in cur.fetchall():
- print(row)
-
-
-
-# j. Retrieve the states along with their population densities
-# (population divided by land area). 
-
-
-cur.execute('SELECT State, Population / Area FROM Density')
-for row in cur.fetchall():
- print(row)
 
 
 
@@ -229,24 +195,7 @@ cur.execute('''CREATE TABLE Capitals(State TEXT,
  Capital TEXT, Population INTEGER)''')
 con.commit()
 
-# The long way:
-# table = [
-#  ('Newfoundland and Labrador', "St. John's", 172918),
-#  ('Prince Edward Island', 'Charlottetown', 58358),
-#  ('Nova Scotia', 'Halifax', 359183),
-#  ('New Brunswick', 'Fredericton', 81346),
-#  ('Quebec', 'Qeubec City', 682757),
-#  ('Ontario', 'Toronto', 4682897),
-#  ('Manitoba', 'Winnipeg', 671274),
-#  ('Saskatchewan', 'Regina', 192800),
-#  ('Alberta', 'Edmonton', 937845),
-#  ('British Columbia', 'Victoria', 311902),
-#  ('Yukon Territory', 'Whitehorse', 21405),
-#  ('Northwest Territories', 'Yellowknife', 16541),
-#  ('Nunavut', 'Iqaluit', 5236),
-# ]
-
-# The quick way:
+# Load the table from a spreadsheet.
 
 capitals_df = pd.read_csv('US_cap_cities_pop.csv')
     
@@ -307,8 +256,7 @@ cur.execute('''SELECT Density.Population, Capitals.Population
 for row in cur.fetchall():
  print(row)
 
-
-# Compare different kinds of joins:
+# Answer to j in the in-class example:
 
 # LEFT JOIN with Capitals ON the LEFT table
 cur.execute('''SELECT Density.Population, Capitals.Population
@@ -329,31 +277,28 @@ for row in cur.fetchall():
 # which are not listed in the other table. 
 
 
+#--------------------------------------------------
+# Fill in the following queries.
+#--------------------------------------------------
+
 
 # c. Retrieve the land area of the states whose capitals 
 # have populations greater than 100,000. 
 
 
-cur.execute('''SELECT Density.Area
- FROM Capitals INNER JOIN Density
- WHERE Capitals.State = Density.State
- AND Capitals.Population > 100000''')
+cur.execute('QUERY GOES HERE')
 for row in cur.fetchall():
  print(row)
 
 
 
 # d. Retrieve the states with land densities
-# greater than ten people per square mile
+# greater than ten people per square kilometer
 # and capital city populations more than 500,000. 
 
 
 
-cur.execute('''SELECT Density.State
- FROM Capitals INNER JOIN Density
- WHERE Capitals.State = Density.State
- AND Density.Population / Density.Area > 10
- AND Capitals.Population > 500000''')
+cur.execute('QUERY GOES HERE')
 for row in cur.fetchall():
  print(row)
 
@@ -361,51 +306,29 @@ for row in cur.fetchall():
 # e. Retrieve the total land area of the USA. 
 
 
-cur.execute('SELECT SUM(Area) FROM Density')
+cur.execute('QUERY GOES HERE')
 print(cur.fetchone())
 
 
 # f. Retrieve the average population of the capital cities. 
 
 
-cur.execute('SELECT AVG(Population) FROM Capitals')
+cur.execute('QUERY GOES HERE')
 print(cur.fetchone())
 
 
 # g. Retrieve the lowest population of the capital cities. 
 
 
-cur.execute('SELECT MIN(Population) FROM Capitals')
+cur.execute('QUERY GOES HERE')
 print(cur.fetchone())
 
 
 # h. Retrieve the highest population of the states or territories. 
 
-cur.execute('SELECT MAX(Population) FROM Density')
+cur.execute('QUERY GOES HERE')
 print(cur.fetchone())
 
-
-# i. Retrieve the states that have land densities within 0.5 persons 
-# per square mile of one another. 
-# Have each pair of provinces reported only once. 
-
-
-cur.execute('''SELECT A.State, B.State
- FROM Density A INNER JOIN Density B
- WHERE A.State < B.State
- AND ABS(A.Population / A.Area - B.Population / B.Area) <
-0.5''')
-for row in cur.fetchall():
- print(row)
-
-
-
-# Check for yourself:
-cur.execute('''SELECT A.State, A.Population / A.Area AS PopDensity
- FROM Density A 
- ORDER BY PopDensity''')
-for row in cur.fetchall():
- print(row)
 
 
 
