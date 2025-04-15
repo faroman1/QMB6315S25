@@ -63,8 +63,6 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 # Check that the change was successful.
 os.getcwd()
-# I got lower case output, even though my folders have some upper case letters.
-# But anyway, it works.
 
 
 
